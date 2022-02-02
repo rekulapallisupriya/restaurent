@@ -8,30 +8,36 @@ const {v4: uuidv4} = require('uuid')
 const passport = require('passport')
 require('dotenv').config
 require('./passport-setup')
+const bcrypt = require('bcrypt')
 
 // const routes = require("./routes");
 
 const port=3300
+let db = null;
+
+app.use(express.json())
+app.use(bodyparser.urlencoded({ extended: false }));
 
 app.use(session({
     secret: uuidv4(),
     resave: false,
     saveUninitialized: true
 }));
-// var con = mysql.createConnection({
-//   host: "localhost",
-//   user: "nitin",
-//   password: "nitin"
-// });
+db = mysql.createConnection({
+  host: "localhost",
+  user: "nitin",
+  password: "nitin",
+  database: "mydb"
+});
 
-// con.connect(function(err) {
-//     if (err) throw err;
-//     console.log("Connected!");
-//     // con.query("CREATE DATABASE mydb", function (err, result) {
-//     //   if (err) throw err;
-//     //   console.log("Database created");
-//     // });
-// });
+db.connect(function(err) {
+    if (err) throw err;
+    console.log("Connected!");
+    // db.query("CREATE DATABASE mydb", function (err, result) {
+    //   if (err) throw err;
+    //   console.log("Database created");
+    // });
+});
 
 // app.set("port",process.env.port//80);
 app.set("views", path.join(__dirname, "views"));
@@ -43,19 +49,36 @@ app.use(passport.session())
 app.use("/", require("./routes/web"));
 app.use("/api", require("./routes/api"));
 
-app.post("/login/", (req, res)=>{
-    // const {email, password} = req.body
-    console.log(req.body)
+app.get("/signup", function(req, res){
+    res.render("home/signup")
+});
 
-    // if (req.body.email == credential.email && req.body.password == credential.password){
-    //     req.session.user = req.body.email
-    //     // res.redirect('/')
-    //     res.end('login success')
-    // }else{
-    //     res.end('invalid username and password')
-    // }
-    res.send(req.body)
- });
+app.post("/signup", async (req, res)=>{
+    const {email, username, name, password, repassword} = req.body
+    const selectUserQuery = `SELECT * FROM user WHERE username = '${username}'`;
+    const dbUser = await db.query(selectUserQuery);
+    console.log(dbUser.values)
+    const hashedPassword = await bcrypt.hash(password, 5)
+    console.log(hashedPassword)
+    if (dbUser.values === undefined) {
+        const createUserQuery = `
+          INSERT INTO 
+            user (email, username, name, password) 
+          VALUES
+            (
+              '${email}',
+              '${username}',
+              '${name}',
+              '${password}'
+            )`;
+        const dbResponse = await db.query(createUserQuery);
+        // const newUserId = dbResponse.lastID;
+        res.send("user is created")
+      } else {
+        res.status = 400;
+        res.send("User already exists");
+      }
+    });
 
 app.listen(port, ()=>{
     console.log(`Server listening at http://localhost:${port}`);

@@ -11,6 +11,7 @@
   "author": "supriya",
   "license": "MIT",
   "dependencies": {
+    "bcrypt": "^5.0.1",
     "body-parser": "^1.19.1",
     "cookie-session": "^2.0.0",
     "dotenv": "^15.0.0",

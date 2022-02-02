@@ -1,3 +1,4 @@
+const { response } = require("express");
 var express = require("express");
 const passport = require("passport");
 
@@ -10,7 +11,7 @@ router.get("/", function(req, res) {
  });
  
  router.get("/home", function(req,res){
-     res.render("home/home");
+    res.render("home/home");
  });
 
  router.get("/about", function(req, res){
@@ -20,29 +21,16 @@ router.get("/", function(req, res) {
 router.get("/login/", function(req, res){
     res.render("home/login")
  });
-router.get("/login", function(req, res){
-    res.render("home/login")
-});
 
 
 
-const credential = {
-    email: "nitingoswami1900@gmail.com",
-    password: "shayna"
-}
 
-// router.post("/login/", (req, res)=>{
-//     // const {email, password} = req.body
-//     console.log(req)
 
-//     if (req.body.email == credential.email && req.body.password == credential.password){
-//         req.session.user = req.body.email
-//         // res.redirect('/')
-//         res.end('login success')
-//     }else{
-//         res.end('invalid username and password')
-//     }
-//  });
+router.post("/login/", (req, res)=>{
+    // const {email, password} = req.body
+    // console.log(req)
+
+ });
 
 router.get('/google', passport.authenticate('google', { scope: ['profile', 'email'] }));
 router.get('/google/callback', passport.authenticate('google', { failureRedirect: '/failed' }),
