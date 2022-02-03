@@ -6,7 +6,7 @@ var router = express.Router();
 //TODO:: add in error and info 
 
 router.use(function(req,res,next){
-    res.locals.currentUUser=req.user;
+    res.locals.currentUser=req.user;
 
     next();
 });
